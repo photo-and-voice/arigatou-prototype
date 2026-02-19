@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ありがとう通信</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #FFFCF7;
+    --text: #2D2A24;
+    --text-sub: #706B62;
+    --text-muted: #A8A29A;
+    --accent: #E8734A;
+    --accent-soft: #FFF0EB;
+    --green: #5FAD6B;
+    --green-soft: #EEFAEF;
+    --blue: #5B8FD4;
+    --blue-soft: #EBF2FC;
+    --gold: #E8B84A;
+    --gold-soft: #FFF9E6;
+    --rose: #D4697A;
+    --rose-soft: #FCEEF1;
+    --border: #EDE9E1;
+    --card: #FFFFFF;
+    --user-bg: #2D2A24;
+    --input-bg: #F7F4EE;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Zen Maru Gothic", "Noto Sans JP", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes float1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(2px, -5px); }
+  }
+  @keyframes float2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-3px, -4px); }
+  }
+  @keyframes float3 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(3px, -3px); }
+  }
+  @keyframes float4 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-2px, -6px); }
+  }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.75; }
+    50% { transform: scale(1.08); opacity: 0.9; }
+  }
+  @keyframes pulse {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+  }
+  @keyframes rotSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .screen { display: none; width: 100%; max-width: 440px; }
+  .screen.active { display: flex; }
+  textarea:focus, button:focus { outline: none; }
+  button { cursor: pointer; font-family: inherit; }
+  button:active { transform: scale(0.97); }
+
+  /* ============================================ */
+  /* CLOVER DECO                                  */
+  /* ============================================ */
+  .clover {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 2rem;
+  }
+
+  .clover-leaf {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.8;
+  }
+
+  /* 4 leaves positioned like a clover */
+  .clover-leaf:nth-child(1) {
+    width: 38px; height: 38px;
+    top: 0; left: 50%; transform: translateX(-50%);
+    animation: float1 3.5s ease-in-out infinite;
+  }
+  .clover-leaf:nth-child(2) {
+    width: 32px; height: 32px;
+    top: 50%; left: 0; transform: translateY(-50%);
+    animation: float2 4s ease-in-out infinite;
+  }
+  .clover-leaf:nth-child(3) {
+    width: 35px; height: 35px;
+    top: 50%; right: 0; transform: translateY(-50%);
+    animation: float3 3.8s ease-in-out infinite;
+  }
+  .clover-leaf:nth-child(4) {
+    width: 30px; height: 30px;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    animation: float4 4.2s ease-in-out infinite;
+  }
+
+  /* Color themes */
+  .clover.theme-welcome .clover-leaf:nth-child(1) { background: var(--accent); }
+  .clover.theme-welcome .clover-leaf:nth-child(2) { background: var(--gold); }
+  .clover.theme-welcome .clover-leaf:nth-child(3) { background: var(--green); }
+  .clover.theme-welcome .clover-leaf:nth-child(4) { background: var(--blue); }
+
+  .clover.theme-warm .clover-leaf:nth-child(1) { background: var(--accent); }
+  .clover.theme-warm .clover-leaf:nth-child(2) { background: var(--rose); opacity: 0.6; }
+  .clover.theme-warm .clover-leaf:nth-child(3) { background: var(--gold); }
+  .clover.theme-warm .clover-leaf:nth-child(4) { background: var(--accent); opacity: 0.5; }
+
+  .clover.theme-grow .clover-leaf:nth-child(1) { background: var(--green); }
+  .clover.theme-grow .clover-leaf:nth-child(2) { background: var(--blue); opacity: 0.6; }
+  .clover.theme-grow .clover-leaf:nth-child(3) { background: var(--green); opacity: 0.6; }
+  .clover.theme-grow .clover-leaf:nth-child(4) { background: var(--gold); }
+
+  .clover.theme-voices .clover-leaf:nth-child(1) { background: var(--blue); }
+  .clover.theme-voices .clover-leaf:nth-child(2) { background: var(--accent); opacity: 0.6; }
+  .clover.theme-voices .clover-leaf:nth-child(3) { background: var(--rose); }
+  .clover.theme-voices .clover-leaf:nth-child(4) { background: var(--green); opacity: 0.6; }
+
+  .clover.theme-complete .clover-leaf:nth-child(1) { background: var(--green); }
+  .clover.theme-complete .clover-leaf:nth-child(2) { background: var(--gold); }
+  .clover.theme-complete .clover-leaf:nth-child(3) { background: var(--accent); }
+  .clover.theme-complete .clover-leaf:nth-child(4) { background: var(--blue); }
+
+  /* Small clover variant */
+  .clover.sm {
+    width: 56px; height: 56px;
+    margin-bottom: 1.8rem;
+  }
+
+  .clover.sm .clover-leaf:nth-child(1) { width: 26px; height: 26px; }
+  .clover.sm .clover-leaf:nth-child(2) { width: 22px; height: 22px; }
+  .clover.sm .clover-leaf:nth-child(3) { width: 24px; height: 24px; }
+  .clover.sm .clover-leaf:nth-child(4) { width: 20px; height: 20px; }
+
+  /* Stem dot (center) */
+  .clover-center {
+    position: absolute;
+    width: 8px; height: 8px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--text);
+    opacity: 0.12;
+  }
+
+  .clover.sm .clover-center {
+    width: 6px; height: 6px;
+  }
+
+  /* ============================================ */
+  /* WELCOME                                      */
+  /* ============================================ */
+  #welcome {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; min-height: 100dvh;
+    padding: 3rem 2rem;
+    text-align: center;
+    animation: fadeUp 0.8s ease-out;
+  }
+
+  .w-brand {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 2rem;
+  }
+
+  .w-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 2;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .w-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-sub);
+    line-height: 2.2;
+    margin-bottom: 0.6rem;
+  }
+
+  .w-from {
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 3rem;
+  }
+
+  .w-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.9;
+    margin-bottom: 2.5rem;
+  }
+
+  .btn-start {
+    background: var(--accent);
+    color: #fff; border: none;
+    padding: 1rem 3.2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    border-radius: 50px;
+    transition: opacity 0.2s;
+  }
+
+  .btn-start:hover { opacity: 0.85; }
+
+  /* ============================================ */
+  /* SCREEN COMMON                                */
+  /* ============================================ */
+  .s-container {
+    flex-direction: column;
+    min-height: 100vh; min-height: 100dvh;
+    animation: fadeUp 0.6s ease-out;
+  }
+
+  .s-header {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,252,247,0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-align: center;
+    position: sticky; top: 0; z-index: 10;
+  }
+
+  .s-header-name {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--text-sub);
+  }
+
+  .s-header-step {
+    font-size: 0.65rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-top: 3px;
+  }
+
+  .s-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 2rem;
+    text-align: center;
+  }
+
+  .s-message {
+    font-size: 1.02rem;
+    font-weight: 400;
+    line-height: 2.3;
+    color: var(--text);
+    margin-bottom: 2rem;
+    max-width: 340px;
+  }
+
+  .s-message strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .s-from {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .s-input-area {
+    padding: 1.2rem 1.5rem;
+    padding-bottom: max(1.2rem, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    background: var(--card);
+  }
+
+  .s-input-label {
+    font-size: 0.78rem;
+    color: var(--text-sub);
+    margin-bottom: 0.8rem;
+    text-align: center;
+  }
+
+  .s-textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 0.85rem 1.1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: none;
+    line-height: 1.8;
+    background: var(--input-bg);
+    color: var(--text);
+    min-height: 50px;
+    max-height: 130px;
+  }
+
+  .s-textarea:focus {
+    border-color: var(--accent);
+    background: #fff;
+  }
+
+  .s-textarea::placeholder {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .s-send-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.7rem;
+  }
+
+  .btn-send {
+    background: var(--accent);
+    color: #fff; border: none;
+    padding: 0.65rem 2rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-radius: 50px;
+    transition: opacity 0.2s;
+  }
+
+  .btn-send:disabled { opacity: 0.25; }
+
+  .s-prev-answer {
+    background: var(--user-bg);
+    color: #fff;
+    padding: 0.7rem 1.1rem;
+    border-radius: 14px;
+    font-size: 0.92rem;
+    line-height: 1.8;
+    max-width: 300px;
+    margin-bottom: 1.8rem;
+    text-align: left;
+    word-break: break-word;
+  }
+
+  .s-info-card {
+    width: 100%;
+    max-width: 340px;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1.3rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.04);
+    text-align: left;
+  }
+
+  .s-info-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.8rem;
+  }
+
+  .voice-item {
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    line-height: 2;
+    color: var(--text);
+  }
+
+  .voice-item:last-child { border-bottom: none; }
+
+  .voice-attr {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  /* COMPLETE */
+  #complete {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; min-height: 100dvh;
+    padding: 3rem 2rem;
+    text-align: center;
+    animation: fadeUp 0.8s ease-out;
+  }
+
+  .c-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 2.4;
+    margin-bottom: 1.5rem;
+    max-width: 320px;
+  }
+
+  .c-sub {
+    font-size: 0.88rem;
+    color: var(--text-sub);
+    line-height: 2.2;
+    margin-bottom: 1rem;
+    max-width: 300px;
+  }
+
+  .c-from {
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 3rem;
+  }
+
+  .btn-restart {
+    background: none;
+    border: 1.5px solid var(--border);
+    color: var(--text-sub);
+    padding: 0.65rem 2rem;
+    font-size: 0.8rem;
+    border-radius: 50px;
+  }
+
+  /* Progress */
+  .progress-dots {
+    display: flex;
+    gap: 7px;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+
+  .p-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s ease;
+  }
+
+  .p-dot.active {
+    background: var(--accent);
+    width: 20px;
+    border-radius: 4px;
+  }
+
+  .p-dot.done { background: var(--green); }
+
+  /* Loading */
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: rgba(255,252,247,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .loading-overlay.active { display: flex; }
+
+  .loading-dots { display: flex; gap: 10px; }
+
+  .l-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .l-dot:nth-child(1) { animation: pulse 1.2s 0s infinite; }
+  .l-dot:nth-child(2) { animation: pulse 1.2s 0.2s infinite; }
+  .l-dot:nth-child(3) { animation: pulse 1.2s 0.4s infinite; }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="loading-dots">
+    <div class="l-dot"></div>
+    <div class="l-dot"></div>
+    <div class="l-dot"></div>
+  </div>
+</div>
+
+<!-- ===== WELCOME ===== -->
+<div class="screen active" id="welcome">
+  <div class="clover theme-welcome">
+    <div class="clover-leaf"></div>
+    <div class="clover-leaf"></div>
+    <div class="clover-leaf"></div>
+    <div class="clover-leaf"></div>
+    <div class="clover-center"></div>
+  </div>
+  <p class="w-brand">ありがとう通信</p>
+  <h1 class="w-title">いつも、ありがとうございます</h1>
+  <p class="w-subtitle">お客様の暮らしを届けてくれるあなたに<br>感謝の気持ちをお届けします</p>
+  <p class="w-from">── AIマネジャーより</p>
+  <p class="w-desc">4月号 ── 3つのやりとりで終わります<br>所要時間 約3分</p>
+  <button class="btn-start" onclick="start()">はじめる</button>
+</div>
+
+<!-- ===== SCREEN 1 ===== -->
+<div class="screen s-container" id="s1">
+  <div class="s-header">
+    <p class="s-header-name">ありがとう通信 ── AIマネジャー</p>
+    <p class="s-header-step">1 / 3</p>
+  </div>
+  <div class="s-body">
+    <div class="clover sm theme-warm">
+      <div class="clover-leaf"></div>
+      <div class="clover-leaf"></div>
+      <div class="clover-leaf"></div>
+      <div class="clover-leaf"></div>
+      <div class="clover-center"></div>
+    </div>
+    <p class="s-message">
+      4月ですね。新しい季節。<br><br>
+      みなさんがお客様のもとに届けてくれるから、<br>暮らしが続いています。<br>
+      それって、すごいことです。<br><br>
+      <strong>この仕事を始めたきっかけ</strong>、<br>
+      教えてもらえますか？
+    </p>
+    <p class="s-from">── AIマネジャー</p>
+    <div class="progress-dots">
+      <div class="p-dot active"></div>
+      <div class="p-dot"></div>
+      <div class="p-dot"></div>
+    </div>
+  </div>
+  <div class="s-input-area">
+    <p class="s-input-label">あなたのことを教えてください</p>
+    <textarea class="s-textarea" id="input1" rows="2" placeholder="誰かに誘われて、求人を見て、なんとなく…なんでも"></textarea>
+    <div class="s-send-row">
+      <button class="btn-send" id="btn1" onclick="submitStep1()" disabled>つぎへ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 2 ===== -->
+<div class="screen s-container" id="s2">
+  <div class="s-header">
+    <p class="s-header-name">ありがとう通信 ── AIマネジャー</p>
+    <p class="s-header-step">2 / 3</p>
+  </div>
+  <div class="s-body">
+    <div class="clover sm" id="s2clover">
+      <div class="clover-leaf"></div>
+      <div class="clover-leaf"></div>
+      <div class="clover-leaf"></div>
+      <div class="clover-leaf"></div>
+      <div class="clover-center"></div>
+    </div>
+    <div class="s-prev-answer" id="s2prev"></div>
+    <p class="s-message" id="s2message"></p>
+    <p class="s-from">── AIマネジャー</p>
+    <div class="progress-dots">
+      <div class="p-dot done"></div>
+      <div class="p-dot active"></div>
+      <div class="p-dot"></div>
+    </div>
+  </div>
+  <div class="s-input-area">
+    <p class="s-input-label">思うこと、なんでも聞かせてください</p>
+    <textarea class="s-textarea" id="input2" rows="2" placeholder="自由にどうぞ"></textarea>
+    <div class="s-send-row">
+      <button class="btn-send" id="btn2" onclick="submitStep2()" disabled>つぎへ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 3 ===== -->
+<div class="screen s-container" id="s3">
+  <div class="s-header">
+    <p class="s-header-name">ありがとう通信 ── AIマネジャー</p>
+    <p class="s-header-step">3 / 3</p>
+  </div>
+  <div class="s-body" style="justify-content: flex-start; padding-top: 2rem;">
+    <div class="clover sm theme-voices">
+      <div class="clover-leaf"></div>
+      <div class="clover-leaf"></div>
+      <div class="clover-leaf"></div>
+      <div class="clover-leaf"></div>
+      <div class="clover-center"></div>
+    </div>
+    <p class="s-message" id="s3react" style="margin-bottom: 1.5rem;"></p>
+
+    <div class="s-info-card">
+      <div class="s-info-label">みんなの声</div>
+      <div class="voice-item">
+        「毎週来るのを待っててくれる方がいて、それだけで朝起きる理由になる」
+        <div class="voice-attr">50代 ── 配達歴12年</div>
+      </div>
+      <div class="voice-item">
+        「"あなたが来ると安心する"って言われたとき、この仕事やっててよかったと思った」
+        <div class="voice-attr">40代 ── 配達歴5年</div>
+      </div>
+      <div class="voice-item">
+        「自分もこの商品使ってるから、自信を持っておすすめできる」
+        <div class="voice-attr">30代 ── 配達歴1年</div>
+      </div>
+    </div>
+
+    <p class="s-message" style="font-size: 0.92rem; margin-bottom: 0.5rem;">
+      こういう声を読むと<br>あたたかい気持ちになります。
+    </p>
+
+    <div class="progress-dots">
+      <div class="p-dot done"></div>
+      <div class="p-dot done"></div>
+      <div class="p-dot active"></div>
+    </div>
+  </div>
+  <div class="s-input-area">
+    <p class="s-input-label">最後にひとこと。お仕事でもっとこんなことできたらな！と思うことあれば教えてください</p>
+    <textarea class="s-textarea" id="input3" rows="2" placeholder="なんでもどうぞ"></textarea>
+    <div class="s-send-row">
+      <button class="btn-send" id="btn3" onclick="submitStep3()" disabled>送信する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COMPLETE ===== -->
+<div class="screen" id="complete">
+  <div class="clover theme-complete">
+    <div class="clover-leaf"></div>
+    <div class="clover-leaf"></div>
+    <div class="clover-leaf"></div>
+    <div class="clover-leaf"></div>
+    <div class="clover-center"></div>
+  </div>
+  <p class="c-title">ありがとうございます。<br><br>みなさんがいるから、<br>お客様の暮らしが続いています。<br><br>これからも一緒に、<br>がんばりましょうね。</p>
+  <p class="c-sub">あなたの声は来月の<br>「ありがとう通信」でお届けします。</p>
+  <p class="c-from">── AIマネジャー</p>
+  <button class="btn-restart" onclick="restart()">もう一度体験する</button>
+</div>
+
+<script>
+// ============================================================
+// キーワード辞書
+// ============================================================
+
+const KEYWORDS = {
+  gratitude: {
+    words: ['ありがとう', '嬉しい', 'うれしい', '感謝', '喜ん', '喜ばれ', '笑顔'],
+    react: 'その気持ち、きっとお客様にも\n伝わっていますよ。',
+    cloverTheme: 'theme-warm'
+  },
+  hardship: {
+    words: ['大変', 'つらい', 'しんどい', 'きつい', '疲れ', '辛い'],
+    react: 'そういう正直な声こそ\n聞きたかったんです。\nがんばっている証拠ですよね。',
+    cloverTheme: 'theme-voices'
+  },
+  joy: {
+    words: ['楽しい', '楽しかった', '面白い', '好き', '大好き', 'やりがい'],
+    react: 'その楽しさ、伝わってきます。\n仕事でそう感じられるって\nとても素敵なことですよね。',
+    cloverTheme: 'theme-grow'
+  },
+  customer: {
+    words: ['お客様', 'お客さん', '会話', '雑談', 'おしゃべり', '話し', '待って'],
+    react: 'お客様との時間って\n一番の財産ですよね。\nマニュアルには載っていない声が\nそこにある。',
+    cloverTheme: 'theme-warm'
+  },
+  delivery: {
+    words: ['配達', '届け', '運ん', '重い', '荷物', 'ルート', '走'],
+    react: '毎日届けるということ。\n当たり前のようで、当たり前じゃない。\nみなさんの足が止まったら\nお客様の暮らしも止まります。',
+    cloverTheme: 'theme-grow'
+  },
+  product: {
+    words: ['商品', 'おすすめ', '新商品', '美味しい', 'おいしい', '使って'],
+    react: '自分が好きなものだと\n自然と伝え方も変わりますよね。\nそういう声が一番届きます。',
+    cloverTheme: 'theme-warm'
+  },
+  weather: {
+    words: ['暑い', '寒い', '雨', '天気', '風', '雪', '花粉'],
+    react: '天気との戦い、\n外の仕事ならではですよね。\n本当に頭が下がります。',
+    cloverTheme: 'theme-voices'
+  },
+  family: {
+    words: ['家族', '子ども', '子供', '夫', '妻', '親', '孫'],
+    react: '家族のことを話してくださって\nありがとうございます。\n仕事も暮らしも、\nぜんぶつながっていますよね。',
+    cloverTheme: 'theme-warm'
+  },
+  newcomer: {
+    words: ['新人', '始め', '最初', '初めて', '1年目', '入った', '慣れ'],
+    react: '新しいスタートって\nワクワクと不安が混ざりますよね。\nでも始めた勇気が一番すごい。',
+    cloverTheme: 'theme-grow'
+  },
+  veteran: {
+    words: ['長い', '年目', 'ベテラン', 'ずっと', '続けて', '何年'],
+    react: '長く続けてこられたこと、\nそれ自体がすごいことです。\n続けられるのは\nそこに何かがあるから。',
+    cloverTheme: 'theme-complete'
+  },
+  anxiety: {
+    words: ['不安', '心配', '自信', 'むずかしい', '難しい'],
+    react: 'そう感じるのは\n真剣にやっている証拠だと思います。\n最初からうまくいく人なんて\nいませんよ。',
+    cloverTheme: 'theme-voices'
+  },
+  invite: {
+    words: ['誘', '紹介', '知り合い', '友だち', '友達', '先輩'],
+    react: 'いい出会いがあったんですね。\n人のつながりで始まる仕事って\nいいですよね。',
+    cloverTheme: 'theme-warm'
+  },
+  money: {
+    words: ['生活', 'お金', '収入', '稼'],
+    react: '正直にお話ししてくださって\nありがとうございます。\n生活のために始めて、\nそこから見つかるものって\nたくさんありますよね。',
+    cloverTheme: 'theme-grow'
+  },
+  health: {
+    words: ['体', '腰', '膝', '足', '健康', '体力', '年齢'],
+    react: '体が資本ですものね。\n無理しすぎないでくださいね。\nみなさんの体が一番大事です。',
+    cloverTheme: 'theme-grow'
+  },
+  spring: {
+    words: ['桜', '花見', '新生活', '入学', '春', '4月'],
+    react: '春って不思議ですよね。\n何かが始まる予感がして\nちょっと背筋が伸びる。',
+    cloverTheme: 'theme-warm'
+  }
+};
+
+const STEP1_RESPONSES = {
+  invite: 'いい出会いがあったんですね。\nその方、今もつながっていますか？\n\n<strong>今、この仕事で一番好きな瞬間</strong>って\nどんなときですか？',
+  money: '正直でいいですよね。\n始めてみて、印象って変わりましたか？\n\n<strong>今、この仕事で一番好きな瞬間</strong>って\nどんなときですか？',
+  newcomer: '始めたばかりなんですね。\nようこそ。最初ってドキドキしますよね。\n\n<strong>はじめてみて生活に何か変化ありましたか？</strong>',
+  veteran: 'ずっと続けてこられたんですね。\nそれだけで本当にすごいことです。\n\n<strong>続けてこられた理由</strong>って\n何だと思いますか？',
+  customer: 'お客様がきっかけだったんですね。\n素敵な話ですね。\n\n<strong>今、この仕事で一番好きな瞬間</strong>って\nどんなときですか？',
+  default: 'ありがとうございます。\nそうやって始まったんですね。\n\n<strong>今、この仕事で一番好きな瞬間</strong>って\nどんなときですか？'
+};
+
+const DEFAULT_REACTS = [
+  'ありがとうございます。\nこういう声を聞けることが\n何よりうれしいです。',
+  'なるほど。\nひとつひとつの言葉に\n暮らしが見えますね。',
+  'いいお話ですね。\nみなさんの声には毎回\nあたたかさを感じます。',
+  'ありがとうございます。\nこういう声がもっと集まったら\nすごいことになると思うんです。'
+];
+
+function matchText(text) {
+  let best = null, bestCount = 0;
+  for (const [key, entry] of Object.entries(KEYWORDS)) {
+    let count = 0;
+    for (const w of entry.words) {
+      if (text.includes(w)) count++;
+    }
+    if (count > bestCount) {
+      bestCount = count;
+      best = { key, ...entry };
+    }
+  }
+  return best;
+}
+
+function getStep1Response(text) {
+  const m = matchText(text);
+  const key = m ? m.key : 'default';
+  const resp = STEP1_RESPONSES[key] || STEP1_RESPONSES['default'];
+  const cloverTheme = m ? m.cloverTheme : 'theme-warm';
+  return { response: resp, cloverTheme };
+}
+
+function getStep2React(text) {
+  const m = matchText(text);
+  if (m) return m.react;
+  return DEFAULT_REACTS[Math.floor(Math.random() * DEFAULT_REACTS.length)];
+}
+
+// ============================================================
+// Flow
+// ============================================================
+
+let text1 = '', text2 = '', text3 = '';
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showLoading(cb) {
+  const el = document.getElementById('loading');
+  el.classList.add('active');
+  setTimeout(() => {
+    el.classList.remove('active');
+    cb();
+  }, 600 + Math.random() * 600);
+}
+
+function start() {
+  showLoading(() => showScreen('s1'));
+}
+
+function submitStep1() {
+  text1 = document.getElementById('input1').value.trim();
+  if (!text1) return;
+  const { response, cloverTheme } = getStep1Response(text1);
+  showLoading(() => {
+    const clover = document.getElementById('s2clover');
+    clover.className = 'clover sm ' + cloverTheme;
+    document.getElementById('s2prev').textContent = text1;
+    document.getElementById('s2message').innerHTML = response;
+    showScreen('s2');
+  });
+}
+
+function submitStep2() {
+  text2 = document.getElementById('input2').value.trim();
+  if (!text2) return;
+  const react = getStep2React(text2);
+  showLoading(() => {
+    document.getElementById('s3react').innerHTML = react.replace(/\n/g, '<br>');
+    showScreen('s3');
+  });
+}
+
+function submitStep3() {
+  text3 = document.getElementById('input3').value.trim();
+  if (!text3) return;
+  showLoading(() => {
+    showScreen('complete');
+  });
+}
+
+function restart() {
+  text1 = ''; text2 = ''; text3 = '';
+  ['input1','input2','input3'].forEach(id => {
+    const ta = document.getElementById(id);
+    ta.value = '';
+    ta.style.height = 'auto';
+  });
+  showScreen('welcome');
+}
+
+['input1','input2','input3'].forEach((id, i) => {
+  const ta = document.getElementById(id);
+  const btn = document.getElementById('btn' + (i + 1));
+  ta.addEventListener('input', () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 130) + 'px';
+    btn.disabled = !ta.value.trim();
+  });
+  ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (ta.value.trim()) btn.click();
+    }
+  });
+});
+</script>
+</body>
+</html>
