@@ -256,6 +256,30 @@
     position: sticky; top: 0; z-index: 10;
   }
 
+  .btn-back {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: inherit;
+    padding: 0.3rem 0.2rem;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+
+  .btn-back:active {
+    color: var(--accent);
+    transform: translateY(-50%) scale(0.97);
+  }
+
+  .s-header-inner {
+    position: relative;
+  }
+
   .s-header-name {
     font-size: 0.78rem;
     font-weight: 500;
@@ -527,8 +551,11 @@
 <!-- ===== SCREEN 1 ===== -->
 <div class="screen s-container" id="s1">
   <div class="s-header">
-    <p class="s-header-name">ありがとう通信 ── AIマネジャー</p>
-    <p class="s-header-step">1 / 3</p>
+    <div class="s-header-inner">
+      <button class="btn-back" onclick="goBack('welcome')">‹ もどる</button>
+      <p class="s-header-name">ありがとう通信 ── AIマネジャー</p>
+      <p class="s-header-step">1 / 3</p>
+    </div>
   </div>
   <div class="s-body">
     <div class="clover sm theme-warm">
@@ -564,8 +591,11 @@
 <!-- ===== SCREEN 2 ===== -->
 <div class="screen s-container" id="s2">
   <div class="s-header">
-    <p class="s-header-name">ありがとう通信 ── AIマネジャー</p>
-    <p class="s-header-step">2 / 3</p>
+    <div class="s-header-inner">
+      <button class="btn-back" onclick="goBack('s1')">‹ もどる</button>
+      <p class="s-header-name">ありがとう通信 ── AIマネジャー</p>
+      <p class="s-header-step">2 / 3</p>
+    </div>
   </div>
   <div class="s-body">
     <div class="clover sm" id="s2clover">
@@ -596,8 +626,11 @@
 <!-- ===== SCREEN 3 ===== -->
 <div class="screen s-container" id="s3">
   <div class="s-header">
-    <p class="s-header-name">ありがとう通信 ── AIマネジャー</p>
-    <p class="s-header-step">3 / 3</p>
+    <div class="s-header-inner">
+      <button class="btn-back" onclick="goBack('s2')">‹ もどる</button>
+      <p class="s-header-name">ありがとう通信 ── AIマネジャー</p>
+      <p class="s-header-step">3 / 3</p>
+    </div>
   </div>
   <div class="s-body" style="justify-content: flex-start; padding-top: 2rem;">
     <div class="clover sm theme-voices">
@@ -840,6 +873,16 @@ function submitStep3() {
   if (!text3) return;
   showLoading(() => {
     showScreen('complete');
+  });
+}
+
+function goBack(targetId) {
+  showScreen(targetId);
+  // 戻った先の入力欄にすでにテキストがあればボタンを有効化
+  ['input1','input2','input3'].forEach((id, i) => {
+    const ta = document.getElementById(id);
+    const btn = document.getElementById('btn' + (i + 1));
+    btn.disabled = !ta.value.trim();
   });
 }
 
